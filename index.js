@@ -88,7 +88,7 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
       }
       cameraAccessory.context.log = self.log;
       if (cameraConfig.motion) {
-        var button = new Service.Switch(cameraName, "MotionTrigger");
+        var button = new Service.Switch(cameraName + " Motion Trigger", "MotionTrigger");
         cameraAccessory.addService(button);
 
         var motion = new Service.MotionSensor(cameraName + " - Dummy");
