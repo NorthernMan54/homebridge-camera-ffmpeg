@@ -13,6 +13,10 @@
       "title": "Video Processor",
       "type": "string"
     },
+    "stillProcessor": {
+      "title": "Still Image Processor",
+      "type": "string"
+    },
     "interfaceName": {
       "title": "Interface Name",
       "type": "string"
