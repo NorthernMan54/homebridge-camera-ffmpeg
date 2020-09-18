@@ -8,13 +8,13 @@ if [[ "$OS" == 'Darwin' ]]; then
   # OPTIONS=
   echo "Mac"
 elif [[ "$OS" == 'Linux' ]]; then
-  INPUT="-c:v h264_mmal"
-  OPTIONS="-c:v h264_omx -b:v 3000000"
+#  INPUT="-c:v h264_mmal"
+#  OPTIONS="-c:v h264_omx -b:v 3000000"
   echo "Linux"
 fi
 
 (
-flock -e 200
+flock -w 240 -e 200 || ( echo "Error: flock timeout"; exit 1 )
 cd /var/tmp
 ls -tr ${INSTANCE}/* | tail -61 | head -60 | awk '{ print "file "$1 }' > ${INSTANCE}.txt
 
