@@ -3,6 +3,7 @@
 INSTANCE=$1
 URL=$2
 #pkill ffmpeg
+rm /var/tmp/*.mp4
 mkdir /var/tmp/${INSTANCE}
 cd /var/tmp/${INSTANCE}
 rm /var/tmp/${INSTANCE}/*.mp4
