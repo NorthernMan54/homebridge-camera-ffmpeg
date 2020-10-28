@@ -13,8 +13,8 @@ fi
 
 
 ( cd /var/tmp
-FILE=`ls -tr ${INSTANCE}/* | tail -3 | head -1`
-
+#FILE=`ls -tr ${INSTANCE}/* | tail -3 | head -1`
+FILE=`ls -ltr ${INSTANCE}/* | awk '{ if ($5 > 10000) print $9 }' | tail -1`
 if [ -z "$FILE" ]
 then
 	pkill ffmpeg
