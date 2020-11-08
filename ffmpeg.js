@@ -178,21 +178,23 @@ FFMPEG.prototype.handleSnapshotRequest = function(request, callback) {
   let videoFilter = ((this.videoFilter === '' || this.videoFilter === null) ? ('scale=' + resolution) : (this.videoFilter)); // empty string or null indicates default
   // In the case of null, skip entirely
   if (videoFilter !== null && videoFilter !== 'none') {
-    if(this.hflip)
+    if (this.hflip)
       vf.push('hflip');
 
-    if(this.vflip)
+    if (this.vflip)
       vf.push('vflip');
 
     vf.push(videoFilter) // vflip and hflip filters must precede the scale filter to work
   }
   var imageSource = this.ffmpegImageSource !== undefined ? this.ffmpegImageSource : this.ffmpegSource;
-  let ffmpeg = spawn(this.stillProcessor, (imageSource + ' -t 1' + ((vf.length > 0) ? (' -vf ' + vf.join(',')) : ('')) + ' -f image2 -').split(' '), {env: process.env});
+  let ffmpeg = spawn(this.stillProcessor, (imageSource + ' -t 1' + ((vf.length > 0) ? (' -vf ' + vf.join(',')) : ('')) + ' -f image2 -').split(' '), {
+    env: process.env
+  });
   var imageBuffer = Buffer.alloc(0);
   var stderrBuffer = Buffer.alloc(0);
   let self = this;
   this.log("Snapshot from " + this.name + " at " + resolution);
-  if(this.debug) console.log(this.stillProcessor + ' ' + imageSource + ' -t 1' + ((vf.length > 0) ? (' -vf ' + vf.join(',')) : ('')) + ' -f image2 -');
+  if (this.debug) console.log(this.stillProcessor + ' ' + imageSource + ' -t 1' + ((vf.length > 0) ? (' -vf ' + vf.join(',')) : ('')) + ' -f image2 -');
   ffmpeg.stdout.on('data', function(data) {
     imageBuffer = Buffer.concat([imageBuffer, data]);
   });
@@ -214,9 +216,10 @@ FFMPEG.prototype.handleSnapshotRequest = function(request, callback) {
         fileName: fileName,
         imageBuffer: imageBuffer
       });
-    } else {
+    } else if (stderrBuffer.toString().length > 0) {
       self.log("ERROR: ", stderrBuffer.toString());
     }
+    this.motion = false;
     callback(null, imageBuffer);
   }.bind(this));
 };
@@ -442,9 +445,11 @@ FFMPEG.prototype.handleStreamRequest = function(request) {
         }
 
         // start the process
-        let ffmpeg = spawn(this.videoProcessor, fcmd.split(' '), {env: process.env});
+        let ffmpeg = spawn(this.videoProcessor, fcmd.split(' '), {
+          env: process.env
+        });
         this.log("Start streaming video from " + this.name + " with " + resolution + "@" + fps + "fps (" + vbitrate + "kBit)");
-        if(this.debug){
+        if (this.debug) {
           console.log(this.videoProcessor + ' ' + fcmd);
         }
 

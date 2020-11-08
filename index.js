@@ -81,7 +81,6 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
               doorbellService.getCharacteristic(Characteristic.ProgrammableSwitchEvent).setValue(0);
               setTimeout(function() {
                 switchService.getCharacteristic(Characteristic.On).updateValue(false);
-                cameraSource.motion = false;
               }, 5000);
             }
             callback(null);
@@ -103,7 +102,6 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
               cameraSource.motion = true;
               setTimeout(function() {
                 button.setCharacteristic(Characteristic.On, false);
-                cameraSource.motion = false;
               }, 5000);
             }
             callback(null);
