@@ -52,7 +52,7 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
 
       var uuid = UUIDGen.generate(cameraName);
       var accessoryType = hap.Accessory.Categories.CAMERA;
-      if(cameraConfig.doorbell){
+      if (cameraConfig.doorbell) {
         accessoryType = hap.Accessory.Categories.VIDEO_DOORBELL;
       }
       var cameraAccessory = new Accessory(cameraName, uuid, accessoryType);
@@ -70,20 +70,22 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
         cameraAccessoryInfo.setCharacteristic(Characteristic.FirmwareRevision, cameraConfig.firmwareRevision);
       }
 
-      if(cameraConfig.doorbell) {
-        var doorbellService = new Service.Doorbell(cameraName+" Doorbell");
+      if (cameraConfig.doorbell) {
+        var doorbellService = new Service.Doorbell(cameraName + " Doorbell");
         cameraAccessory.addService(doorbellService);
         var switchService = new Service.Switch(cameraName + " Doorbell Trigger", "DoorbellTrigger");
         switchService.getCharacteristic(Characteristic.On)
-        .on('set', function(state, callback){
-          if(state){
-            doorbellService.getCharacteristic(Characteristic.ProgrammableSwitchEvent).setValue(0);
-            setTimeout(function(){
-              switchService.getCharacteristic(Characteristic.On).updateValue(false);
-            }, 1000);
-          }
-          callback(null, state);
-        });
+          .on('set', function(state, callback) {
+            if (state) {
+              cameraSource.motion = true;
+              doorbellService.getCharacteristic(Characteristic.ProgrammableSwitchEvent).setValue(0);
+              setTimeout(function() {
+                switchService.getCharacteristic(Characteristic.On).updateValue(false);
+                cameraSource.motion = false;
+              }, 5000);
+            }
+            callback(null);
+          });
         cameraAccessory.addService(switchService);
       }
       cameraAccessory.context.log = self.log;
@@ -95,15 +97,17 @@ ffmpegPlatform.prototype.didFinishLaunching = function() {
         cameraAccessory.addService(motion);
 
         button.getCharacteristic(Characteristic.On)
-        .on('set', function(state, callback){
-          motion.setCharacteristic(Characteristic.MotionDetected, (state ? 1 : 0));
-          if(state){
-            setTimeout(function(){
-              button.setCharacteristic(Characteristic.On, false);
-            }, 5000);
-          }
-          callback(null, state);
-        });
+          .on('set', function(state, callback) {
+            motion.setCharacteristic(Characteristic.MotionDetected, (state ? 1 : 0));
+            if (state) {
+              cameraSource.motion = true;
+              setTimeout(function() {
+                button.setCharacteristic(Characteristic.On, false);
+                cameraSource.motion = false;
+              }, 5000);
+            }
+            callback(null);
+          });
       }
 
       var cameraSource = new FFMPEG(hap, cameraConfig, self.log, self.config.stillProcessor, self.config.videoProcessor, interfaceName);

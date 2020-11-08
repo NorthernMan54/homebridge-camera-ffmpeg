@@ -40,6 +40,7 @@ function FFMPEG(hap, cameraConfig, log, stillProcessor, videoProcessor, interfac
   this.mapaudio = ffmpegOpt.mapaudio || "0:1";
   this.videoFilter = ffmpegOpt.videoFilter || null; // null is a valid discrete value
   this.interfaceName = interfaceName;
+  this.motion = false;
 
   if (!ffmpegOpt.source) {
     throw new Error("Missing source for camera.");
@@ -203,7 +204,7 @@ FFMPEG.prototype.handleSnapshotRequest = function(request, callback) {
     callback(error, imageBuffer);
   });
   ffmpeg.on('close', function(code) {
-    if (this.uploader && imageBuffer.length > 0) {
+    if (this.motion && this.uploader && imageBuffer.length > 0) {
       var d = new Date();
       var fileName = this.name.replace(/ /g, "_") + "_" + d.toLocaleString().replace(/ |,|[\/]/g, "_") + ".jpeg";
       self.log("Queue", imageBuffer.length, fileName);
