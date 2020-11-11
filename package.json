@@ -24,13 +24,15 @@
     "nodemon": ">=2.0.2"
   },
   "dependencies": {
+    "aws-sdk": "^2.789.0",
+    "better-queue": ">=3.8.10",
     "debug": "^4.1.1",
     "ffmpeg-for-homebridge": "0.0.6",
     "googleapis": ">=50.0.0",
     "ip": "^1.1.5",
-    "debug": "^4.1.1",
-    "upload-gphotos": "^=3.1.0",
-    "better-queue": ">=3.8.10"
-
+    "upload-gphotos": "^=3.1.0"
+  },
+  "scripts": {
+    "watch": "nodemon"
   }
 }

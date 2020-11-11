@@ -7,6 +7,8 @@ var spawn = require('child_process').spawn;
 var pathToFfmpeg = require('ffmpeg-for-homebridge');
 var Gphoto = require('./gphoto').gphoto;
 
+var AwsUploader = require('./lib/AwsUploader');
+
 module.exports = {
   FFMPEG: FFMPEG
 };
@@ -59,6 +61,7 @@ function FFMPEG(hap, cameraConfig, log, stillProcessor, videoProcessor, interfac
   if (this.uploader) {
     this.cameraConfig = cameraConfig;
     this.gphoto = new Gphoto(cameraConfig);
+    this.awsUploader = new AwsUploader(cameraConfig);
   }
 
   var numberOfStreams = ffmpegOpt.maxStreams || 2;
@@ -207,6 +210,9 @@ FFMPEG.prototype.handleSnapshotRequest = function(request, callback) {
   });
   ffmpeg.on('close', function(code) {
     if (this.motion && this.uploader && imageBuffer.length > 0) {
+      self.awsUploader.upload(imageBuffer, function(err, rsp) {
+        // console.log('awsUploader', err, rsp);
+      });
       var d = new Date();
       var fileName = this.name.replace(/ /g, "_") + "_" + d.toLocaleString().replace(/ |,|[\/]/g, "_") + ".jpeg";
       self.log("Queue", imageBuffer.length, fileName);

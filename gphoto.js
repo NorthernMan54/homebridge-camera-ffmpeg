@@ -28,8 +28,8 @@ function gphoto(cameraConfig) {
         username: cameraConfig.username,
         password: cameraConfig.password,
         options: {
-          silence: false,
-          progress: true
+          silence: true,
+          progress: false
         }
       });
       await gphotos.login();
