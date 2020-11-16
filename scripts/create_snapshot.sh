@@ -19,6 +19,7 @@ if [ -z "$FILE" ]
 then
 	pkill ffmpeg
 else
+  sleep 2
 	timeout --signal=9 5s ~/npm/lib/node_modules/ffmpeg-for-homebridge/ffmpeg -hide_banner -loglevel error -i $FILE -frames:v 1 ${OPTIONS} -f image2 -
 fi
 )
