@@ -216,8 +216,6 @@ FFMPEG.prototype.handleSnapshotRequest = function(request, callback) {
         fileName: fileName,
         imageBuffer: imageBuffer
       });
-    } else if (stderrBuffer.toString().length > 0) {
-      self.log("ERROR: ", stderrBuffer.toString());
     }
     this.motion = false;
     callback(null, imageBuffer);
