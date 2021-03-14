@@ -57,12 +57,19 @@ function googleUpload(upload, callback) {
         debug("Upload", photo);
         // this.log("addPhoto", photo.createdAt);
         const album =
-          (await gphotos.searchAlbum((this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures'))) || (await gphotos.createAlbum((this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures')));
+          (await gphotos.searchAlbum({
+            title: (this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures')
+          })) || (await gphotos.createAlbum({
+            title: (this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures')
+          }));
         // const album = await gphotos.searchOrCreateAlbum((this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures'));
+        debug("album", album);
+        debug("album name", (this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures'));
         // this.log("searchOrCreateAlbum", photo.createdAt);
         // const id = await album.addPhoto(photo);
         const id = await album.append(photo);
         this.log("Uploaded", upload.fileName);
+        this.log("id", id);
       } catch (err) {
         this.log("Error:", err);
         gphotos.params = null;

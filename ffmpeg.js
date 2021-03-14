@@ -175,8 +175,9 @@ FFMPEG.prototype.handleSnapshotRequest = function(request, callback) {
       break;
   }
   let vf = [];
-  let videoFilter = ((this.videoFilter === '' || this.videoFilter === null) ? ('scale=' + resolution) : (this.videoFilter)); // empty string or null indicates default
+  // let videoFilter = ((this.videoFilter === '' || this.videoFilter === null) ? ('scale=' + resolution) : (this.videoFilter)); // empty string or null indicates default
   // In the case of null, skip entirely
+  /*
   if (videoFilter !== null && videoFilter !== 'none') {
     if (this.hflip)
       vf.push('hflip');
@@ -186,15 +187,16 @@ FFMPEG.prototype.handleSnapshotRequest = function(request, callback) {
 
     vf.push(videoFilter) // vflip and hflip filters must precede the scale filter to work
   }
+  */
   var imageSource = this.ffmpegImageSource !== undefined ? this.ffmpegImageSource : this.ffmpegSource;
-  let ffmpeg = spawn(this.stillProcessor, (imageSource + ' -t 1' + ((vf.length > 0) ? (' -vf ' + vf.join(',')) : ('')) + ' -f image2 -').split(' '), {
+  let ffmpeg = spawn(this.stillProcessor, (imageSource + ' -t 1' + ' -f image2 -').split(' '), {
     env: process.env
   });
   var imageBuffer = Buffer.alloc(0);
   var stderrBuffer = Buffer.alloc(0);
   let self = this;
   this.log("Snapshot from " + this.name + " at " + resolution);
-  if (this.debug) console.log(this.stillProcessor + ' ' + imageSource + ' -t 1' + ((vf.length > 0) ? (' -vf ' + vf.join(',')) : ('')) + ' -f image2 -');
+  if (this.debug) console.log(this.stillProcessor + ' ' + (imageSource + ' -t 1' + ((vf.length > 0) ? (' -vf ' + vf.join(',')) : ('')) + ' -f image2 -'));
   ffmpeg.stdout.on('data', function(data) {
     imageBuffer = Buffer.concat([imageBuffer, data]);
   });
