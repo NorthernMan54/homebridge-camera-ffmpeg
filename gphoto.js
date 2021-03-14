@@ -1,6 +1,8 @@
 'use strict';
 
-const GPhotos = require('upload-gphotos').default;
+const {
+  GPhotos
+} = require('upload-gphotos');
 var Queue = require('better-queue');
 var streamifier = require('./lib/streamifier.js');
 let debug = require('debug')('ffmpeg:gphoto');
@@ -24,16 +26,13 @@ var gphotos;
 function gphoto(cameraConfig) {
   (async () => {
     if (!gphotos) {
-      gphotos = new GPhotos({
+      gphotos = new GPhotos();
+      await gphotos.signin({
         username: cameraConfig.username,
-        password: cameraConfig.password,
-        options: {
-          silence: false,
-          progress: true
-        }
+        password: cameraConfig.password
       });
-      await gphotos.login();
-      debug("Logged in");
+      await gphotos.signin();
+      debug("Logged in", gphotos);
     }
   })();
 }
@@ -45,14 +44,24 @@ function googleUpload(upload, callback) {
       // streamifier.createReadStream(new Buffer ([97, 98, 99])).pipe(process.stdout);
       try {
         if (!gphotos.params) {
-          await gphotos.login();
+          await gphotos.signin();
           debug("Logged in to Google");
         }
-        const photo = await gphotos.uploadFromStream(streamifier.createReadStream(upload.imageBuffer), upload.imageBuffer.length, upload.fileName);
+        //        const photo = await gphotos.uploadFromStream(streamifier.createReadStream(upload.imageBuffer), upload.imageBuffer.length, upload.fileName);
+
+        const photo = await gphotos.upload({
+          stream: streamifier.createReadStream(upload.imageBuffer),
+          size: upload.imageBuffer.length,
+          filename: upload.fileName,
+        });
+        debug("Upload", photo);
         // this.log("addPhoto", photo.createdAt);
-        const album = await gphotos.searchOrCreateAlbum((this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures'));
+        const album =
+          (await gphotos.searchAlbum((this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures'))) || (await gphotos.createAlbum((this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures')));
+        // const album = await gphotos.searchOrCreateAlbum((this.cameraConfig.album ? this.cameraConfig.album : 'Camera Pictures'));
         // this.log("searchOrCreateAlbum", photo.createdAt);
-        const id = await album.addPhoto(photo);
+        // const id = await album.addPhoto(photo);
+        const id = await album.append(photo);
         this.log("Uploaded", upload.fileName);
       } catch (err) {
         this.log("Error:", err);
